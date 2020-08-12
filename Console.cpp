@@ -62,6 +62,19 @@ void FConsole::SetCurrentColor()
     SetConsoleTextAttribute(this->hConsole, colorCode);
 }
 
+void FConsole::Clear()
+{
+    ResetColor();
+
+#if defined _WIN32
+    system("cls");
+#elif defined(__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
+    system("clear");
+#elif defined(__APPLE__)
+    system("clear");
+#endif
+}
+
 void FConsole::PrintAskTable()
 {
     cout << "0 = \x0" << endl;

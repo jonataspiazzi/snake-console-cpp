@@ -11,14 +11,39 @@ constexpr int index2d(int x, int y)
 
 FSnakeGame::FSnakeGame()
 {
-    this->snake = new FSnake(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_SNAKE_START_SIZE - 1);
-
     Reset();
 }
 
 void FSnakeGame::Reset()
 {
+    if (this->snake != null)
+    {
+        delete this->snake;
+    }
+
+    this->snake = new FSnake(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_SNAKE_START_SIZE - 1);
+    this->snakeXDir = -1;
+    this->snakeYDir = 0;
+
     ClearBuffer();
+}
+
+void FSnakeGame::Update()
+{
+    FSnake *snake = this->snake->GetLastTail();
+    FSnake *head = snake->GetHead();
+
+    while (head != null)
+    {
+        snake->X = head->X;
+        snake->Y = head->Y;
+
+        snake = head;
+        head = head->GetHead();
+    }
+
+    snake->X += this->snakeXDir;
+    snake->Y += this->snakeYDir;
 }
 
 void FSnakeGame::Render()
@@ -50,7 +75,7 @@ void FSnakeGame::RenderSnake()
 
     while (snake != null)
     {
-        this->buffer[index2d(snake->GetX(), snake->GetY())] = EObjectType::SnakeBody;
+        this->buffer[index2d(snake->X, snake->Y)] = EObjectType::SnakeBody;
 
         snake = snake->GetTail();
     }

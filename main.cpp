@@ -4,6 +4,9 @@
 #pragma once
 
 #include <iostream>
+#include <chrono>
+#include <thread>
+#include <conio.h>
 #include "Console.h"
 #include "SnakeGame.h"
 
@@ -19,14 +22,68 @@ FConsole Console;
 
 void PrintBuffer();
 EConsoleColor GetColor(EObjectType type);
+void FrameRateEnforcer(int32 frameRate);
+
+int buff1 = '0';
+int buff2 = '0';
+
+void first()
+{
+    cout << "Hello From First!\n";
+
+    while (buff2 == '0')
+    {
+        buff1 = getch();
+        cout << "Readed First!\n";
+    }
+
+    cout << "First Ended\n";
+}
+
+void second()
+{
+    cout << "Hello From Second!\n";
+
+    while (buff1 == '0')
+    {
+        buff2 = getch();
+        cout << "Readed Second!\n";
+    }
+
+    cout << "Second Ended\n";
+}
 
 int main()
 {
-    game.Render();
-    for (int i = 0; i < 1000; i++)
+    std::thread t1(first);
+    std::thread t2(second);
+
+    cout << "Hello From Main!\n";
+
+    for (int i = 0; i < 0; i++)
     {
-        PrintBuffer();
+        cout << ".";
+        Sleep(100);
     }
+
+    t1.detach();
+    t1.join();
+    t2.join();
+
+    cout << "end";
+
+    return 0;
+
+    Console.Clear();
+
+    for (int i = 0; i < 8; i++)
+    {
+        game.Update();
+        game.Render();
+        PrintBuffer();
+        FrameRateEnforcer(2);
+    }
+
     return 0;
 }
 
@@ -65,4 +122,23 @@ EConsoleColor GetColor(EObjectType type)
     default:
         return EConsoleColor::Blue;
     }
+}
+
+std::chrono::steady_clock::time_point lastFrame = std::chrono::steady_clock::now();
+
+void FrameRateEnforcer(int32 frameRate)
+{
+    int32 minInterval = 1000 / frameRate;
+
+    std::chrono::steady_clock::time_point currentFrame = std::chrono::steady_clock::now();
+    int32 elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(currentFrame - lastFrame).count();
+
+    if (elapsed >= minInterval)
+    {
+        lastFrame = std::chrono::steady_clock::now();
+        return;
+    }
+
+    Sleep(minInterval - elapsed);
+    lastFrame = std::chrono::steady_clock::now();
 }

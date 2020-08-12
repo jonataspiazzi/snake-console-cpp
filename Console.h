@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <windows.h>
+#include "Unreal.h"
 
 using namespace std;
 
@@ -28,11 +28,11 @@ enum class EConsoleColor
 class EBlockChar
 {
 public:
-    inline static const string Block100 = "\xDB";
-    inline static const string Block75 = "\xB2";
-    inline static const string Block50 = "\xB1";
-    inline static const string Block25 = "\xB0";
-    inline static const string Block0 = "\x20";
+    inline static const FText Block100 = "\xDB";
+    inline static const FText Block75 = "\xB2";
+    inline static const FText Block50 = "\xB1";
+    inline static const FText Block25 = "\xB0";
+    inline static const FText Block0 = "\x20";
 };
 
 class FConsole
@@ -43,9 +43,10 @@ public:
     void SetBackgroundColor(EConsoleColor color);
     void SetColor(EConsoleColor background, EConsoleColor foreground);
     void ResetColor();
-    void SetCursorPosition(int left, int top);
+    void SetCursorPosition(int32 left, int32 top);
     void SetCursorVisible(bool value);
     void PrintAskTable();
+    void Clear();
 
 private:
     void SetCurrentColor();

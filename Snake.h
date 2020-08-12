@@ -1,21 +1,19 @@
 #pragma once
 
-#include <string>
-
-using FText = std::string;
-using int32 = int;
-#define null NULL
+#include "Unreal.h"
 
 class FSnake
 {
 public:
-    FSnake(int32 x, int32 y, int32 tailSize);
-    FSnake* GetTail();
-    int32 GetX();
-    int32 GetY();
+    FSnake(int32 x, int32 y, int32 tailSize, FSnake *head = null);
+    ~FSnake();
+    FSnake *GetHead();
+    FSnake *GetTail();
+    FSnake *GetLastTail();
+    int32 X;
+    int32 Y;
 
 private:
-    int32 x;
-    int32 y;
-    FSnake* tail;
+    FSnake *tail;
+    FSnake *head;
 };

@@ -23,6 +23,7 @@ class FSnakeGame
 public:
     FSnakeGame();
     void Reset();
+    void Update();
     void Render();
     EObjectType GetBufferPixel(int x, int y);
     const int Width = GAME_WIDTH;
@@ -35,5 +36,7 @@ private:
     FSnake *snake;
     int32 foodX;
     int32 foodY;
+    int32 snakeXDir;
+    int32 snakeYDir;
     array<EObjectType, GAME_WIDTH * GAME_HEIGHT> buffer;
 };
