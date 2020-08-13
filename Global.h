@@ -14,11 +14,23 @@ enum class EObjectType
     Food = 2
 };
 
-enum class EDirection
+enum class EKeyboardInput
 {
     None = 0,
-    Left = 1,
-    Up = 2,
-    Right = 3,
-    Down = 4
+    MoveLeft = 1,
+    MoveUp = 2,
+    MoveRight = 3,
+    MoveDown = 4,
+    Exit = 5
 };
+
+enum class EGameStatus
+{
+    Stopped = 0x00,
+    Running = 0x01,
+    Playing = 0x02 | 0x01,
+    Won = 0x04 | 0x00,
+    Lost = 0x08 | 0x00
+};
+
+EGameStatus operator&(EGameStatus left, EGameStatus right);

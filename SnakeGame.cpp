@@ -2,18 +2,15 @@
 
 #include "SnakeGame.h"
 
-constexpr int index2d(int x, int y)
-{
-    return y * GAME_HEIGHT + x;
-}
+constexpr int index2d(int x, int y) { return y * GAME_HEIGHT + x; }
 
-FSnakeGame::FSnakeGame()
-{
-    Reset();
-}
+FSnakeGame::FSnakeGame() { Reset(); }
 
 void FSnakeGame::Reset()
 {
+    this->status = EGameStatus::Playing;
+    this->score = 0;
+
     if (this->snake != null)
     {
         delete this->snake;
@@ -26,10 +23,23 @@ void FSnakeGame::Reset()
     ClearBuffer();
 }
 
-void FSnakeGame::Update(EDirection dir)
+void FSnakeGame::Update(EKeyboardInput dir)
 {
-    SetDirection(dir);
+    SetCommand(dir);
 
+    if (this->IsGameEnded())
+        return;
+
+    UpdateSnake();
+
+    if (this->status == EGameStatus::Running)
+        return;
+
+    UpdateFood();
+}
+
+void FSnakeGame::UpdateSnake()
+{
     FSnake *snake = this->snake->GetLastTail();
     FSnake *head = snake->GetHead();
 
@@ -46,6 +56,8 @@ void FSnakeGame::Update(EDirection dir)
     snake->Y += this->snakeYDir;
 }
 
+void FSnakeGame::UpdateFood() {}
+
 void FSnakeGame::Render()
 {
     ClearBuffer();
@@ -60,8 +72,12 @@ EObjectType FSnakeGame::GetBufferPixel(int x, int y)
 
 bool FSnakeGame::IsGameEnded() const
 {
-    return false;
+    return (this->status & EGameStatus::Running) != EGameStatus::Running;
 }
+
+EGameStatus FSnakeGame::GetGameStatus() const { return this->status; }
+
+int32 FSnakeGame::GetScore() const { return this->score; }
 
 void FSnakeGame::ClearBuffer()
 {
@@ -91,27 +107,30 @@ void FSnakeGame::RenderFood()
     this->buffer[index2d(this->foodX, this->foodY)] = EObjectType::Food;
 }
 
-void FSnakeGame::SetDirection(EDirection dir)
+void FSnakeGame::SetCommand(EKeyboardInput key)
 {
-    switch (dir)
+    switch (key)
     {
-    case EDirection::Left:
+    case EKeyboardInput::MoveLeft:
         this->snakeXDir = -1;
         this->snakeYDir = 0;
         break;
-    case EDirection::Up:
+    case EKeyboardInput::MoveUp:
         this->snakeXDir = 0;
         this->snakeYDir = -1;
         break;
-    case EDirection::Right:
+    case EKeyboardInput::MoveRight:
         this->snakeXDir = 1;
         this->snakeYDir = 0;
         break;
-    case EDirection::Down:
+    case EKeyboardInput::MoveDown:
         this->snakeXDir = 0;
         this->snakeYDir = 1;
         break;
-    case EDirection::None:
+    case EKeyboardInput::Exit:
+        this->status = EGameStatus::Lost;
+        break;
+    case EKeyboardInput::None:
     default:
         break;
     }

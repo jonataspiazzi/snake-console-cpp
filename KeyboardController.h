@@ -5,18 +5,18 @@
 
 using namespace std;
 
-class FInputBuffer
+class FKeyboardController
 {
 public:
-    void Start();
+    void Listen();
     void Disable();
-    EDirection GetCurrent();
-    void NotifyChar(int32 value);
+    EKeyboardInput GetInput();
+    void OnKeydown(int32 key);
     bool IsEnabled() const;
 
 private:
     bool hasPreArrow;
     bool enabled;
-    EDirection current;
+    EKeyboardInput input;
     thread backgroundWorker;
 };

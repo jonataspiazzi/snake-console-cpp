@@ -1,12 +1,11 @@
 // started at 11:20
-// cl /std:c++17 /Fo"./obj/" /EHsc *.cpp /Fe:"./bin/snake.exe" && cls && bin\snake.exe
 
 #pragma once
 
 #include <iostream>
 #include <chrono>
 #include "Console.h"
-#include "InputBuffer.h"
+#include "KeyboardController.h"
 #include "SnakeGame.h"
 
 using namespace std;
@@ -18,38 +17,41 @@ constexpr EConsoleColor SNAKE_COLOR = EConsoleColor::White;
 
 FSnakeGame game;
 FConsole Console;
-FInputBuffer iBuffer;
+FKeyboardController keyboard;
 
 void ChangeSnakeHead();
-void PrintBuffer();
+void RenderGame();
 EConsoleColor GetColor(EObjectType type);
+EConsoleColor GetLostColor(EObjectType type);
 void FrameRateEnforcer(int32 frameRate);
 
 int main()
 {
-    iBuffer.Start();
+    keyboard.Listen();
     Console.Clear();
 
     while (true)
     {
-        game.Update(iBuffer.GetCurrent());
+        game.Update(keyboard.GetInput());
+        game.Render();
+        RenderGame();
 
         if (game.IsGameEnded())
         {
             break;
         }
 
-        game.Render();
-        PrintBuffer();
         FrameRateEnforcer(10);
     }
 
     return 0;
 }
 
-void PrintBuffer()
+void RenderGame()
 {
     Console.SetCursorVisible(false);
+
+    EConsoleColor (*getColor)(EObjectType) = game.GetGameStatus() != EGameStatus::Lost ? &GetColor : &GetLostColor;
 
     for (int32 y = 0; y < game.Height; y++)
     {
@@ -57,7 +59,7 @@ void PrintBuffer()
 
         for (int32 x = 0; x < game.Width; x++)
         {
-            EConsoleColor color = GetColor(game.GetBufferPixel(x, y));
+            EConsoleColor color = getColor(game.GetBufferPixel(x, y));
             Console.SetColor(color, color);
 
             for (int32 c = 0; c < PIXEL_WIDTH; c++)
@@ -68,6 +70,10 @@ void PrintBuffer()
     }
 
     Console.ResetColor();
+
+    Console.SetCursorPosition(0, game.Height);
+
+    cout << "Esc = Exit (Loose), Points = " << game.GetScore() << endl;
 }
 
 EConsoleColor GetColor(EObjectType type)
@@ -81,6 +87,20 @@ EConsoleColor GetColor(EObjectType type)
     case EObjectType::Empty:
     default:
         return EConsoleColor::Blue;
+    }
+}
+
+EConsoleColor GetLostColor(EObjectType type)
+{
+    switch (type)
+    {
+    case EObjectType::Food:
+        return EConsoleColor::LightRed;
+    case EObjectType::SnakeBody:
+        return EConsoleColor::Red;
+    case EObjectType::Empty:
+    default:
+        return EConsoleColor::BrightWhite;
     }
 }
 
