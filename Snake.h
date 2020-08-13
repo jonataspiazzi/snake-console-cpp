@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Unreal.h"
+#include "Global.h"
 
 class FSnake
 {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include "Snake.h"
 
 FSnake::FSnake(int32 x, int32 y, int32 tailSize, FSnake *head)

@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include "Console.h"
-#include "Windows.h"
 
 using namespace std;
 

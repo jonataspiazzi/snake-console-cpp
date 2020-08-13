@@ -5,9 +5,8 @@
 
 #include <iostream>
 #include <chrono>
-#include <thread>
-#include <conio.h>
 #include "Console.h"
+#include "InputBuffer.h"
 #include "SnakeGame.h"
 
 using namespace std;
@@ -19,69 +18,30 @@ constexpr EConsoleColor SNAKE_COLOR = EConsoleColor::White;
 
 FSnakeGame game;
 FConsole Console;
+FInputBuffer iBuffer;
 
+void ChangeSnakeHead();
 void PrintBuffer();
 EConsoleColor GetColor(EObjectType type);
 void FrameRateEnforcer(int32 frameRate);
 
-int buff1 = '0';
-int buff2 = '0';
-
-void first()
-{
-    cout << "Hello From First!\n";
-
-    while (buff2 == '0')
-    {
-        buff1 = getch();
-        cout << "Readed First!\n";
-    }
-
-    cout << "First Ended\n";
-}
-
-void second()
-{
-    cout << "Hello From Second!\n";
-
-    while (buff1 == '0')
-    {
-        buff2 = getch();
-        cout << "Readed Second!\n";
-    }
-
-    cout << "Second Ended\n";
-}
-
 int main()
 {
-    std::thread t1(first);
-    std::thread t2(second);
-
-    cout << "Hello From Main!\n";
-
-    for (int i = 0; i < 0; i++)
-    {
-        cout << ".";
-        Sleep(100);
-    }
-
-    t1.detach();
-    t1.join();
-    t2.join();
-
-    cout << "end";
-
-    return 0;
-
+    iBuffer.Start();
     Console.Clear();
 
-    for (int i = 0; i < 8; i++)
+    while (true)
     {
-        game.Update();
+        game.Update(iBuffer.GetCurrent());
+
+        if (game.IsGameEnded())
+        {
+            break;
+        }
+
         game.Render();
         PrintBuffer();
-        FrameRateEnforcer(2);
+        FrameRateEnforcer(10);
     }
 
     return 0;
@@ -139,6 +99,6 @@ void FrameRateEnforcer(int32 frameRate)
         return;
     }
 
-    Sleep(minInterval - elapsed);
+    std::this_thread::sleep_for(std::chrono::milliseconds(minInterval - elapsed));
     lastFrame = std::chrono::steady_clock::now();
 }

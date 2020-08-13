@@ -1,19 +1,9 @@
-#pragma onde
+#pragma once
 
 #include <thread>
-#include <conio.h>
-#include "Unreal.h"
+#include "Global.h"
 
 using namespace std;
-
-enum class EDirection
-{
-    None,
-    Left,
-    Top,
-    Right,
-    Botton
-};
 
 class FInputBuffer
 {
@@ -21,8 +11,12 @@ public:
     void Start();
     void Disable();
     EDirection GetCurrent();
+    void NotifyChar(int32 value);
+    bool IsEnabled() const;
 
 private:
+    bool hasPreArrow;
     bool enabled;
-    EDirection buffer;
+    EDirection current;
+    thread backgroundWorker;
 };

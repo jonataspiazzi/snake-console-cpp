@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include "Snake.h"
 #include "SnakeGame.h"
 
 constexpr int index2d(int x, int y)
@@ -28,8 +26,10 @@ void FSnakeGame::Reset()
     ClearBuffer();
 }
 
-void FSnakeGame::Update()
+void FSnakeGame::Update(EDirection dir)
 {
+    SetDirection(dir);
+
     FSnake *snake = this->snake->GetLastTail();
     FSnake *head = snake->GetHead();
 
@@ -58,6 +58,11 @@ EObjectType FSnakeGame::GetBufferPixel(int x, int y)
     return this->buffer[index2d(x, y)];
 }
 
+bool FSnakeGame::IsGameEnded() const
+{
+    return false;
+}
+
 void FSnakeGame::ClearBuffer()
 {
     for (int32 y = 0; y < GAME_HEIGHT; y++)
@@ -84,4 +89,30 @@ void FSnakeGame::RenderSnake()
 void FSnakeGame::RenderFood()
 {
     this->buffer[index2d(this->foodX, this->foodY)] = EObjectType::Food;
+}
+
+void FSnakeGame::SetDirection(EDirection dir)
+{
+    switch (dir)
+    {
+    case EDirection::Left:
+        this->snakeXDir = -1;
+        this->snakeYDir = 0;
+        break;
+    case EDirection::Up:
+        this->snakeXDir = 0;
+        this->snakeYDir = -1;
+        break;
+    case EDirection::Right:
+        this->snakeXDir = 1;
+        this->snakeYDir = 0;
+        break;
+    case EDirection::Down:
+        this->snakeXDir = 0;
+        this->snakeYDir = 1;
+        break;
+    case EDirection::None:
+    default:
+        break;
+    }
 }

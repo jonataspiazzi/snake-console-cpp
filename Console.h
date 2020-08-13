@@ -1,7 +1,7 @@
 #pragma once
 
 #include <windows.h>
-#include "Unreal.h"
+#include "Global.h"
 
 using namespace std;
 
