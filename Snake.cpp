@@ -2,11 +2,18 @@
 
 #include "Snake.h"
 
+FSnake::FSnake(int32 x, int32 y, FSnake *tail)
+{
+    this->X = x;
+    this->Y = y;
+    this->head = null;
+    this->tail = tail;
+}
+
 FSnake::FSnake(int32 x, int32 y, int32 tailSize, FSnake *head)
 {
     this->X = x;
     this->Y = y;
-
     this->head = head;
 
     if (tailSize >= 0)
@@ -24,17 +31,19 @@ FSnake::~FSnake()
     }
 }
 
-FSnake *FSnake::GetHead()
+FSnake *FSnake::GetHead() const
 {
     return this->head;
 }
 
-FSnake *FSnake::GetTail()
+FSnake *FSnake::GetTail() const
 {
     return this->tail;
 }
 
 FSnake *FSnake::GetLastTail()
 {
+    FSnake *last = tail == (FSnake *)null ? this : tail->GetLastTail();
+
     return this->tail == null ? this : this->tail->GetLastTail();
 }

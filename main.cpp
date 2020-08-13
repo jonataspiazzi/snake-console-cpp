@@ -41,7 +41,7 @@ int main()
             break;
         }
 
-        FrameRateEnforcer(10);
+        FrameRateEnforcer(4);
     }
 
     return 0;

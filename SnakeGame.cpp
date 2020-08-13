@@ -1,6 +1,8 @@
 #pragma once
 
+#include <stdlib.h>
 #include "SnakeGame.h"
+#include <iostream>
 
 constexpr int index2d(int x, int y) { return y * GAME_HEIGHT + x; }
 
@@ -10,6 +12,8 @@ void FSnakeGame::Reset()
 {
     this->status = EGameStatus::Playing;
     this->score = 0;
+    this->foodX = GAME_WIDTH * 25 / 100;
+    this->foodY = GAME_HEIGHT * 25 / 100;
 
     if (this->snake != null)
     {
@@ -17,8 +21,8 @@ void FSnakeGame::Reset()
     }
 
     this->snake = new FSnake(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_SNAKE_START_SIZE - 1);
-    this->snakeXDir = -1;
-    this->snakeYDir = 0;
+    this->velocityX = -1;
+    this->velocityY = 0;
 
     ClearBuffer();
 }
@@ -31,15 +35,50 @@ void FSnakeGame::Update(EKeyboardInput dir)
         return;
 
     UpdateSnake();
+}
 
-    if (this->status == EGameStatus::Running)
-        return;
+bool FSnakeGame::ShouldSnakeMove()
+{
+    int32 nextX = this->snake->X + this->velocityX;
+    int32 nextY = this->snake->Y + this->velocityY;
 
-    UpdateFood();
+    // Is hitting the border.
+    if (nextX < 0 || nextX >= GAME_WIDTH || nextY < 0 || nextY >= GAME_HEIGHT)
+    {
+        this->status = EGameStatus::Lost;
+        return false;
+    }
+
+    // Is hitting it's own body.
+    for (FSnake *snake = this->snake->GetTail(); snake != null; snake = snake->GetTail())
+    {
+        if (snake->X == nextX && snake->Y == nextY)
+        {
+            this->status = EGameStatus::Lost;
+            return false;
+        }
+    }
+
+    // Is eating
+    if (this->foodX == this->snake->X && this->foodY == this->snake->Y)
+    {
+        this->snake = new FSnake(this->foodX, this->foodY, this->snake);
+
+        cout << "Snake created.";
+
+        return false;
+    }
+
+    return true;
 }
 
 void FSnakeGame::UpdateSnake()
 {
+    if (!ShouldSnakeMove())
+    {
+        return;
+    }
+
     FSnake *snake = this->snake->GetLastTail();
     FSnake *head = snake->GetHead();
 
@@ -52,11 +91,13 @@ void FSnakeGame::UpdateSnake()
         head = head->GetHead();
     }
 
-    snake->X += this->snakeXDir;
-    snake->Y += this->snakeYDir;
+    snake->X += this->velocityX;
+    snake->Y += this->velocityY;
 }
 
-void FSnakeGame::UpdateFood() {}
+void FSnakeGame::UpdateFood()
+{
+}
 
 void FSnakeGame::Render()
 {
@@ -109,29 +150,46 @@ void FSnakeGame::RenderFood()
 
 void FSnakeGame::SetCommand(EKeyboardInput key)
 {
+    int32 newVX = 0;
+    int32 newVY = 0;
+
     switch (key)
     {
     case EKeyboardInput::MoveLeft:
-        this->snakeXDir = -1;
-        this->snakeYDir = 0;
+        newVX = -1;
+        newVY = 0;
         break;
     case EKeyboardInput::MoveUp:
-        this->snakeXDir = 0;
-        this->snakeYDir = -1;
+        newVX = 0;
+        newVY = -1;
         break;
     case EKeyboardInput::MoveRight:
-        this->snakeXDir = 1;
-        this->snakeYDir = 0;
+        newVX = 1;
+        newVY = 0;
         break;
     case EKeyboardInput::MoveDown:
-        this->snakeXDir = 0;
-        this->snakeYDir = 1;
+        newVX = 0;
+        newVY = 1;
         break;
     case EKeyboardInput::Exit:
         this->status = EGameStatus::Lost;
-        break;
+        return;
     case EKeyboardInput::None:
     default:
-        break;
+        return;
     }
+
+    if (Is180Degrees(this->velocityX, newVX) || Is180Degrees(this->velocityY, newVY))
+    {
+        // can't turn 180 degress on x.
+        return;
+    }
+
+    this->velocityX = newVX;
+    this->velocityY = newVY;
+}
+
+bool FSnakeGame::Is180Degrees(int32 velocityA, int32 velocityB)
+{
+    return velocityA != velocityB && velocityA + velocityB == 0;
 }

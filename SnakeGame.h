@@ -30,14 +30,16 @@ private:
     void ClearBuffer();
     void RenderSnake();
     void RenderFood();
+    bool ShouldSnakeMove();
     void UpdateSnake();
     void UpdateFood();
     void SetCommand(EKeyboardInput dir);
+    bool Is180Degrees(int32 source, int32 dest);
     FSnake *snake;
     int32 foodX;
     int32 foodY;
-    int32 snakeXDir;
-    int32 snakeYDir;
+    int32 velocityX;
+    int32 velocityY;
     EGameStatus status;
     int32 score;
     array<EObjectType, GAME_WIDTH * GAME_HEIGHT> buffer;
