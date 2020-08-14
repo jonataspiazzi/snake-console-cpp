@@ -1,19 +1,25 @@
 #pragma once
 
 #include <stdlib.h>
+#include <time.h>
 #include "SnakeGame.h"
-#include <iostream>
 
-constexpr int index2d(int x, int y) { return y * GAME_HEIGHT + x; }
+constexpr int32 index2d(int32 x, int32 y) { return y * GAME_WIDTH + x; }
+constexpr int32 xFromIndex(int32 index) { return index % GAME_WIDTH; }
+constexpr int32 yFromIndex(int32 index) { return index / GAME_WIDTH; }
 
-FSnakeGame::FSnakeGame() { Reset(); }
+FSnakeGame::FSnakeGame()
+{
+    srand(time(null));
+    Reset();
+}
 
 void FSnakeGame::Reset()
 {
     this->status = EGameStatus::Playing;
     this->score = 0;
-    this->foodX = GAME_WIDTH * 25 / 100;
-    this->foodY = GAME_HEIGHT * 25 / 100;
+    this->foodX = 7; //GAME_WIDTH * 25 / 100;
+    this->foodY = GAME_HEIGHT * 50 / 100;
 
     if (this->snake != null)
     {
@@ -46,6 +52,7 @@ bool FSnakeGame::ShouldSnakeMove()
     if (nextX < 0 || nextX >= GAME_WIDTH || nextY < 0 || nextY >= GAME_HEIGHT)
     {
         this->status = EGameStatus::Lost;
+
         return false;
     }
 
@@ -55,16 +62,17 @@ bool FSnakeGame::ShouldSnakeMove()
         if (snake->X == nextX && snake->Y == nextY)
         {
             this->status = EGameStatus::Lost;
+
             return false;
         }
     }
 
     // Is eating
-    if (this->foodX == this->snake->X && this->foodY == this->snake->Y)
+    if (this->foodX == nextX && this->foodY == nextY)
     {
         this->snake = new FSnake(this->foodX, this->foodY, this->snake);
 
-        cout << "Snake created.";
+        UpdateFood();
 
         return false;
     }
@@ -97,6 +105,25 @@ void FSnakeGame::UpdateSnake()
 
 void FSnakeGame::UpdateFood()
 {
+    this->score++;
+
+    int32 index = rand() % (GAME_WIDTH * GAME_HEIGHT - this->snake->GetSize());
+
+    for (int32 i = 0, empty = 0; i < this->buffer.size(); i++)
+    {
+        if (this->buffer[i] == EObjectType::SnakeBody)
+            continue;
+
+        if (index == empty)
+        {
+            this->foodX = xFromIndex(i);
+            this->foodY = yFromIndex(i);
+
+            return;
+        }
+
+        empty++;
+    }
 }
 
 void FSnakeGame::Render()

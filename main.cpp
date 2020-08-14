@@ -1,5 +1,3 @@
-// started at 11:20
-
 #pragma once
 
 #include <iostream>
@@ -11,24 +9,21 @@
 using namespace std;
 
 constexpr int PIXEL_WIDTH = 3;
-constexpr EConsoleColor GROUND_COLOR = EConsoleColor::Blue;
-constexpr EConsoleColor FOOD_COLOR = EConsoleColor::Gray;
-constexpr EConsoleColor SNAKE_COLOR = EConsoleColor::White;
-
-FSnakeGame game;
-FConsole Console;
-FKeyboardController keyboard;
 
 void ChangeSnakeHead();
 void RenderGame();
 EConsoleColor GetColor(EObjectType type);
 EConsoleColor GetLostColor(EObjectType type);
-void FrameRateEnforcer(int32 frameRate);
+void FrameRateEnforcer(float frameRate);
+
+FConsole console;
+FSnakeGame game;
+FKeyboardController keyboard;
 
 int main()
 {
     keyboard.Listen();
-    Console.Clear();
+    console.Clear();
 
     while (true)
     {
@@ -49,18 +44,18 @@ int main()
 
 void RenderGame()
 {
-    Console.SetCursorVisible(false);
+    console.SetCursorVisible(false);
 
     EConsoleColor (*getColor)(EObjectType) = game.GetGameStatus() != EGameStatus::Lost ? &GetColor : &GetLostColor;
 
     for (int32 y = 0; y < game.Height; y++)
     {
-        Console.SetCursorPosition(0, y);
+        console.SetCursorPosition(0, y);
 
         for (int32 x = 0; x < game.Width; x++)
         {
             EConsoleColor color = getColor(game.GetBufferPixel(x, y));
-            Console.SetColor(color, color);
+            console.SetColor(color, color);
 
             for (int32 c = 0; c < PIXEL_WIDTH; c++)
             {
@@ -69,11 +64,11 @@ void RenderGame()
         }
     }
 
-    Console.ResetColor();
+    console.ResetColor();
 
-    Console.SetCursorPosition(0, game.Height);
+    console.SetCursorPosition(0, game.Height);
 
-    cout << "Esc = Exit (Loose), Points = " << game.GetScore() << endl;
+    cout << "Esc = Exit(Loose), Score = " << game.GetScore() << endl;
 }
 
 EConsoleColor GetColor(EObjectType type)
@@ -83,7 +78,7 @@ EConsoleColor GetColor(EObjectType type)
     case EObjectType::Food:
         return EConsoleColor::BrightWhite;
     case EObjectType::SnakeBody:
-        return EConsoleColor::BrightWhite;
+        return EConsoleColor::White;
     case EObjectType::Empty:
     default:
         return EConsoleColor::Blue;
@@ -106,7 +101,7 @@ EConsoleColor GetLostColor(EObjectType type)
 
 std::chrono::steady_clock::time_point lastFrame = std::chrono::steady_clock::now();
 
-void FrameRateEnforcer(int32 frameRate)
+void FrameRateEnforcer(float frameRate)
 {
     int32 minInterval = 1000 / frameRate;
 

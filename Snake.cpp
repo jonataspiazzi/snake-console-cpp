@@ -8,6 +8,7 @@ FSnake::FSnake(int32 x, int32 y, FSnake *tail)
     this->Y = y;
     this->head = null;
     this->tail = tail;
+    tail->head = this;
 }
 
 FSnake::FSnake(int32 x, int32 y, int32 tailSize, FSnake *head)
@@ -39,6 +40,18 @@ FSnake *FSnake::GetHead() const
 FSnake *FSnake::GetTail() const
 {
     return this->tail;
+}
+
+int32 FSnake::GetSize() const
+{
+    int32 size = 1;
+
+    if (this->tail != null)
+    {
+        size += this->tail->GetSize();
+    }
+
+    return size;
 }
 
 FSnake *FSnake::GetLastTail()

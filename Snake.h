@@ -10,6 +10,7 @@ public:
     ~FSnake();
     FSnake *GetHead() const;
     FSnake *GetTail() const;
+    int32 GetSize() const;
     FSnake *GetLastTail();
     int32 X;
     int32 Y;

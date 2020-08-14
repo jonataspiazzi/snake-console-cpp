@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <array>
 #include "Snake.h"
 #include "Global.h"
@@ -8,7 +7,6 @@
 constexpr int GAME_WIDTH = 20;
 constexpr int GAME_HEIGHT = 20;
 constexpr int GAME_SNAKE_START_SIZE = 5;
-constexpr int index2d(int x, int y);
 
 using namespace std;
 
